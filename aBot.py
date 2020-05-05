@@ -13,7 +13,7 @@ minPublicChannels = int(settings['minPublicChannels'])
 maxPublicChannels = int(settings['maxPublicChannels'])
 emptyPublicChannels = int(settings['emptyPublicChannels'])
 publicChannelNamePool = settings['publicChannelNamePool'].split(', ')
-token = config['Settings']['token']
+token = settings['token']
 
 client = discord.Client()
 
