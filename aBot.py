@@ -19,7 +19,7 @@ client = discord.Client()
 
 @client.event
 async def on_voice_state_update(member, before, after):
-  if client.is_ready():
+  if client.is_ready() and before.channel != after.channel:
     print(timeNow() + str(member) + ' moved')
     everyone = discord.utils.get(member.guild.roles, name='@everyone')
     allChannelNames = []
