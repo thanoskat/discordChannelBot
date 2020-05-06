@@ -29,7 +29,12 @@ client = discord.Client(status = discord.Status.dnd)
 @client.event
 async def on_voice_state_update(member, before, after):
   if client.is_ready() and before.channel != after.channel:
-    print(timeNow() + str(member) + ' moved')
+    if before.channel is None:
+      print(timeNow() + str(member) + ' joined')
+    elif after.channel is None:
+      print(timeNow() + str(member) + ' left')
+    else:
+      print(timeNow() + str(member) + ' moved')
     everyone = discord.utils.get(member.guild.roles, name='@everyone')
     allChannelNames = []
     hiddenChannels = []
@@ -56,12 +61,9 @@ async def on_voice_state_update(member, before, after):
       for name in publicChannelNamePool:
         if name not in allChannelNames:
           clonedPublicChannel = await regularChannels[0].clone(name = name)
-          print(timeNow() + clonedPublicChannel.name + ' created')
           break
     elif unoccupiedPublicChannelsCount > emptyPublicChannels and len(regularChannels) > minPublicChannels:
-      toDeletePublicChannel = unoccupiedPublicChannels[len(unoccupiedPublicChannels) - 1]
-      await toDeletePublicChannel.delete()
-      print(timeNow() + toDeletePublicChannel.name + ' deleted')
+      await unoccupiedPublicChannels[len(unoccupiedPublicChannels) - 1].delete()
 
     # Hidden channel management
     unoccupiedHiddenChannelsCount = 0
@@ -76,13 +78,20 @@ async def on_voice_state_update(member, before, after):
         if name not in allChannelNames:
           clonedHiddenChannel = await hiddenChannels[0].clone(name = name)
           await clonedHiddenChannel.edit(position=len(hiddenChannels) + 1)
-          print(timeNow() + clonedHiddenChannel.name + ' created')
           break
     elif unoccupiedHiddenChannelsCount > emptyHiddenChannels and len(hiddenChannels) > minHiddenChannels:
-      toDeleteHiddenChannel = unoccupiedHiddenChannels[len(unoccupiedHiddenChannels) - 1]
-      await toDeleteHiddenChannel.delete()
-      print(timeNow() + toDeleteHiddenChannel.name + ' deleted')
+      await unoccupiedHiddenChannels[len(unoccupiedHiddenChannels) - 1].delete()
 
+@client.event
+async def on_guild_channel_create(channel):
+  print(timeNow()+channel.name+' created at '+str(channel.position))
+@client.event
+async def on_guild_channel_delete(channel):
+  print(timeNow()+channel.name+' deleted from '+str(channel.position))
+@client.event
+async def on_guild_channel_update(before, after):
+  if before.position != after.position:
+    print(timeNow()+before.name+' moved from '+str(before.position)+' to '+str(after.position))
 @client.event
 async def on_message(message):
   if client.is_ready():
@@ -94,16 +103,17 @@ async def on_message(message):
       elif message.author != client.user:
         print(timeNow() + str(message.author) + ' messaged: ' + message.content)
         await message.channel.send(answer)
-
 @client.event
 async def on_ready():
   for guild in client.guilds:
-    print(timeNow() + 'Logged in as {0} in {1}'.format(client.user, guild.name))
-
+    print(timeNow() + 'Logged in as '+str(client.user)+' in '+guild.name)
 @client.event
-async def on_connect(): print(timeNow() + 'Connected ')
+async def on_connect():
+  print(timeNow() + 'Connected ')
 @client.event
-async def on_disconnect(): print(timeNow() + 'Disconnected ')
+async def on_disconnect():
+  print(timeNow() + 'Disconnected ')
 @client.event
-async def on_resumed(): print(timeNow() + 'Resumed ')
+async def on_resumed():
+  print(timeNow() + 'Resumed ')
 client.run(token)
