@@ -15,8 +15,6 @@ emptyPublicChannels = int(settings['emptyPublicChannels'])
 publicChannelNamePool = settings['publicChannelNamePool'].split(', ')
 token = settings['token']
 
-
-
 client = discord.Client()
 
 @client.event
