@@ -24,7 +24,7 @@ async def on_voice_state_update(member, before, after):
     everyone = discord.utils.get(member.guild.roles, name='@everyone')
     allChannelNames = []
     hiddenChannels = []
-    regularChannels = []
+    publicChannels = []
     for channel in member.guild.voice_channels:
       for overwrite in channel.overwrites_for(everyone):
         if overwrite[0] == 'read_messages':
@@ -32,24 +32,24 @@ async def on_voice_state_update(member, before, after):
             hiddenChannels.append(channel)
             allChannelNames.append(channel.name)
           else:
-            regularChannels.append(channel)
+            publicChannels.append(channel)
             allChannelNames.append(channel.name)
 
     # Public channel management
     unoccupiedPublicChannelsCount = 0
     unoccupiedPublicChannels = []
-    for i,channel in enumerate(regularChannels):
+    for i,channel in enumerate(publicChannels):
       if len(channel.members) == 0:
         unoccupiedPublicChannelsCount += 1
         unoccupiedPublicChannels.append(channel)
-    if unoccupiedPublicChannelsCount < emptyPublicChannels and len(regularChannels) < maxPublicChannels:
+    if unoccupiedPublicChannelsCount < emptyPublicChannels and len(publicChannels) < maxPublicChannels:
       random.shuffle(publicChannelNamePool)
       for name in publicChannelNamePool:
         if name not in allChannelNames:
-          clonedPublicChannel = await regularChannels[0].clone(name = name)
+          clonedPublicChannel = await publicChannels[0].clone(name = name)
           print(timeNow() + clonedPublicChannel.name + ' created')
           break
-    elif unoccupiedPublicChannelsCount > emptyPublicChannels and len(regularChannels) > minPublicChannels:
+    elif unoccupiedPublicChannelsCount > emptyPublicChannels and len(publicChannels) > minPublicChannels:
       toDeletePublicChannel = unoccupiedPublicChannels[len(unoccupiedPublicChannels) - 1]
       await toDeletePublicChannel.delete()
       print(timeNow() + toDeletePublicChannel.name + ' deleted')
