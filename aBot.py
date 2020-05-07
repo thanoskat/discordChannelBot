@@ -38,10 +38,9 @@ async def on_voice_state_update(member, before, after):
         if overwrite[0] == 'read_messages':
           if overwrite[1] == False:
             hiddenChannels.append(channel)
-            allChannelNames.append(channel.name)
           else:
             publicChannels.append(channel)
-            allChannelNames.append(channel.name)
+          allChannelNames.append(channel.name)
 
     # Public channel management
     unoccupiedPublicChannelsCount = 0
