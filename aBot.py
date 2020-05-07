@@ -45,7 +45,7 @@ async def on_voice_state_update(member, before, after):
     # Public channel management
     unoccupiedPublicChannelsCount = 0
     unoccupiedPublicChannels = []
-    for i,channel in enumerate(publicChannels):
+    for channel in publicChannels:
       if len(channel.members) == 0:
         unoccupiedPublicChannelsCount += 1
         unoccupiedPublicChannels.append(channel)
@@ -61,7 +61,7 @@ async def on_voice_state_update(member, before, after):
     # Hidden channel management
     unoccupiedHiddenChannelsCount = 0
     unoccupiedHiddenChannels = []
-    for i,channel in enumerate(hiddenChannels):
+    for channel in hiddenChannels:
       if len(channel.members) == 0:
         unoccupiedHiddenChannelsCount += 1
         unoccupiedHiddenChannels.append(channel)
