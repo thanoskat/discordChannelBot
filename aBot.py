@@ -1,27 +1,21 @@
 import discord,datetime,random,configparser,os
-def timeNow(): return (datetime.datetime.now().strftime('%d/%m/%Y %H:%M:%S') + ' ')
+def timeNow(): return (datetime.datetime.now().strftime('%d/%m/%Y %H:%M:%S')+' ')
 
 # Read config file
 config = configparser.ConfigParser()
 config.read(os.path.splitext(__file__)[0] + '.ini', encoding='utf-8')
 settings = config['Settings']
-# Hidden channels
 minHiddenChannels = int(settings['minHiddenChannels'])
 maxHiddenChannels = int(settings['maxHiddenChannels'])
 emptyHiddenChannels = int(settings['emptyHiddenChannels'])
 hiddenChannelNamePool = settings['hiddenChannelNamePool'].split(', ')
-# Public channels
 minPublicChannels = int(settings['minPublicChannels'])
 maxPublicChannels = int(settings['maxPublicChannels'])
 emptyPublicChannels = int(settings['emptyPublicChannels'])
 publicChannelNamePool = settings['publicChannelNamePool'].split(', ')
-# Whitelisted user IDs
 whitelistedUserIDs = settings['whitelistedUsers'].split(', ')
-# Text channel ID
 textChannelID = int(settings['textChannel'])
-# Answer
 answer = settings['answer']
-# Bot token
 token = config['Settings']['token']
 
 client = discord.Client(status = discord.Status.dnd)
@@ -30,11 +24,11 @@ client = discord.Client(status = discord.Status.dnd)
 async def on_voice_state_update(member, before, after):
   if client.is_ready() and before.channel != after.channel:
     if before.channel is None:
-      print(timeNow() + str(member) + ' joined')
+      print(timeNow()+str(member)+' joined at position '+str(after.channel.position))
     elif after.channel is None:
-      print(timeNow() + str(member) + ' left')
+      print(timeNow()+str(member)+' left from position '+str(before.channel.position))
     else:
-      print(timeNow() + str(member) + ' moved')
+      print(timeNow()+str(member)+' moved from position '+str(before.channel.position)+' to '+str(after.channel.position))
     everyone = discord.utils.get(member.guild.roles, name='@everyone')
     allChannelNames = []
     hiddenChannels = []
@@ -52,7 +46,7 @@ async def on_voice_state_update(member, before, after):
     # Public channel management
     unoccupiedPublicChannelsCount = 0
     unoccupiedPublicChannels = []
-    for channel in publicChannels:
+    for i,channel in enumerate(publicChannels):
       if len(channel.members) == 0:
         unoccupiedPublicChannelsCount += 1
         unoccupiedPublicChannels.append(channel)
@@ -68,7 +62,7 @@ async def on_voice_state_update(member, before, after):
     # Hidden channel management
     unoccupiedHiddenChannelsCount = 0
     unoccupiedHiddenChannels = []
-    for channel in hiddenChannels:
+    for i,channel in enumerate(hiddenChannels):
       if len(channel.members) == 0:
         unoccupiedHiddenChannelsCount += 1
         unoccupiedHiddenChannels.append(channel)
@@ -77,21 +71,22 @@ async def on_voice_state_update(member, before, after):
       for name in hiddenChannelNamePool:
         if name not in allChannelNames:
           clonedHiddenChannel = await hiddenChannels[0].clone(name = name)
-          await clonedHiddenChannel.edit(position=len(hiddenChannels) + 1)
+          await clonedHiddenChannel.edit(position=len(hiddenChannels))
           break
     elif unoccupiedHiddenChannelsCount > emptyHiddenChannels and len(hiddenChannels) > minHiddenChannels:
       await unoccupiedHiddenChannels[len(unoccupiedHiddenChannels) - 1].delete()
 
 @client.event
 async def on_guild_channel_create(channel):
-  print(timeNow()+channel.name+' created at '+str(channel.position))
+  print(timeNow()+channel.name+' created at position '+str(channel.position))
 @client.event
 async def on_guild_channel_delete(channel):
-  print(timeNow()+channel.name+' deleted from '+str(channel.position))
+  print(timeNow()+channel.name+' deleted from position '+str(channel.position))
 @client.event
 async def on_guild_channel_update(before, after):
   if before.position != after.position:
-    print(timeNow()+before.name+' moved from '+str(before.position)+' to '+str(after.position))
+    print(timeNow()+before.name+' moved from position '+str(before.position)+' to '+str(after.position))
+
 @client.event
 async def on_message(message):
   if client.is_ready():
@@ -101,19 +96,21 @@ async def on_message(message):
           textChannel = discord.utils.get(guild.text_channels, id = textChannelID)
           await textChannel.send(message.content)
       elif message.author != client.user:
-        print(timeNow() + str(message.author) + ' messaged: ' + message.content)
+        print(timeNow()+str(message.author)+' messaged: '+message.content)
         await message.channel.send(answer)
+
 @client.event
 async def on_ready():
   for guild in client.guilds:
-    print(timeNow() + 'Logged in as '+str(client.user)+' in '+guild.name)
+    print(timeNow()+'Logged in as '+str(client.user)+' in '+guild.name)
 @client.event
 async def on_connect():
-  print(timeNow() + 'Connected ')
+  print(timeNow()+'Connected')
 @client.event
 async def on_disconnect():
-  print(timeNow() + 'Disconnected ')
+  print(timeNow()+'Disconnected')
 @client.event
 async def on_resumed():
-  print(timeNow() + 'Resumed ')
+  print(timeNow()+'Resumed')
+
 client.run(token)
