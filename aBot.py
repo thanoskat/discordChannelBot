@@ -1,5 +1,5 @@
 import discord,datetime,random,configparser,os
-def timeNow(): return (datetime.datetime.now().strftime('%d/%m/%Y %H:%M:%S')+' ')
+def timeNow(): return (datetime.datetime.now().strftime('%d/%m/%Y %H:%M:%S'))
 
 # Read config file
 config = configparser.ConfigParser()
@@ -24,11 +24,11 @@ client = discord.Client(status = discord.Status.dnd)
 async def on_voice_state_update(member, before, after):
   if client.is_ready() and before.channel != after.channel:
     if before.channel is None:
-      print(timeNow()+str(member)+' joined at position '+str(after.channel.position))
+      print(f'{timeNow()} {str(member)} joined at position {str(after.channel.position)}')
     elif after.channel is None:
-      print(timeNow()+str(member)+' left from position '+str(before.channel.position))
+      print(f'{timeNow()} {str(member)} left from position {str(before.channel.position)}')
     else:
-      print(timeNow()+str(member)+' moved from position '+str(before.channel.position)+' to '+str(after.channel.position))
+      print(f'{timeNow()} {str(member)} moved from position {str(before.channel.position)} to {str(after.channel.position)}')
     everyone = discord.utils.get(member.guild.roles, name='@everyone')
     allChannelNames = []
     hiddenChannels = []
@@ -77,14 +77,14 @@ async def on_voice_state_update(member, before, after):
 
 @client.event
 async def on_guild_channel_create(channel):
-  print(timeNow()+channel.name+' created at position '+str(channel.position))
+  print(f'{timeNow()} {channel.name} created at position {str(channel.position)}')
 @client.event
 async def on_guild_channel_delete(channel):
-  print(timeNow()+channel.name+' deleted from position '+str(channel.position))
+  print(f'{timeNow()} {channel.name} deleted from position {str(channel.position)}')
 @client.event
 async def on_guild_channel_update(before, after):
   if before.position != after.position:
-    print(timeNow()+before.name+' moved from position '+str(before.position)+' to '+str(after.position))
+    print(f'{timeNow()} {before.name} moved from position {str(before.position)} to {str(after.position)}')
 
 @client.event
 async def on_message(message):
@@ -95,21 +95,21 @@ async def on_message(message):
           textChannel = discord.utils.get(guild.text_channels, id = textChannelID)
           await textChannel.send(message.content)
       elif message.author != client.user:
-        print(timeNow()+str(message.author)+' messaged: '+message.content)
+        print(f'{timeNow()} {str(message.author)} messaged: {message.content}')
         await message.channel.send(answer)
 
 @client.event
 async def on_ready():
   for guild in client.guilds:
-    print(timeNow()+'Logged in as '+str(client.user)+' in '+guild.name)
+    print(f'{timeNow()} Logged in as {str(client.user)} in {guild.name}')
 @client.event
 async def on_connect():
-  print(timeNow()+'Connected')
+  print(f'{timeNow()} Connected')
 @client.event
 async def on_disconnect():
-  print(timeNow()+'Disconnected')
+  print(f'{timeNow()} Disconnected')
 @client.event
 async def on_resumed():
-  print(timeNow()+'Resumed')
+  print(f'{timeNow()} Resumed')
 
 client.run(token)
