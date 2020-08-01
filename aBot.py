@@ -16,7 +16,7 @@ publicChannelNamePool = settings['publicChannelNamePool'].split(', ')
 whitelistedUserIDs = settings['whitelistedUsers'].split(', ')
 textChannelID = int(settings['textChannel'])
 answer = settings['answer']
-token = config['Settings']['token']
+token = settings['token']
 
 client = discord.Client(status = discord.Status.dnd)
 c = 18 #fixed output name width
